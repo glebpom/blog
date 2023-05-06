@@ -1,0 +1,13 @@
+
+# syntax=docker/dockerfile:1.5
+
+ARG RUST_VERSION=1.69
+
+FROM rust:${RUST_VERSION}-bullseye
+
+ADD . /code
+WORKDIR /code
+
+RUN cargo build --release
+
+CMD ["/code/target/release/ultimate-dockerfile-for-rust"]

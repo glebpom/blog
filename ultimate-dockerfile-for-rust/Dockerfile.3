@@ -1,0 +1,25 @@
+# syntax=docker/dockerfile:1.5
+
+ARG RUST_VERSION=1.69
+
+FROM rust:${RUST_VERSION}-bullseye as build
+
+RUN mkdir -p code/src
+WORKDIR /code
+
+RUN echo "fn main() {}" > src/main.rs
+COPY Cargo.toml .
+COPY Cargo.lock .
+
+RUN cargo fetch
+
+ADD . /code
+WORKDIR /code
+
+RUN cargo build --release
+
+FROM debian:bullseye as main
+
+COPY --from=build /code/target/release/ultimate-dockerfile-for-rust /usr/local/bin/ultimate-dockerfile-for-rust
+
+RUN ["/usr/local/bin/ultimate-dockerfile-for-rust"]

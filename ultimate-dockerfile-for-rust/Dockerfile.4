@@ -1,0 +1,33 @@
+# syntax=docker/dockerfile:1.5
+
+ARG RUST_VERSION=1.69
+
+FROM --platform=$BUILDPLATFORM rust:${RUST_VERSION}-bullseye as build-common
+
+RUN mkdir -p code/src
+WORKDIR /code
+
+RUN echo "fn main() {}" > src/main.rs
+COPY Cargo.toml .
+COPY Cargo.lock .
+
+RUN cargo fetch
+
+ADD . /code
+WORKDIR /code
+
+FROM --platform=$BUILDPLATFORM build-common as build-arch
+
+ARG TARGETARCH
+
+ADD /docker /docker
+
+RUN /docker/build-for-targetarch.sh $TARGETARCH
+
+FROM debian:bullseye as main
+
+ARG TARGETARCH
+
+COPY --from=build-arch /usr/local/bin/ultimage-dockerfile-for-rust /usr/local/bin/ultimage-dockerfile-for-rust
+
+CMD ["/usr/local/bin/ultimage-dockerfile-for-rust"]
