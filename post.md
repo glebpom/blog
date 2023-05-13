@@ -12,7 +12,7 @@ cargo check
 
 Let's start by creating a very simple `Dockerfile`, which just compiles our code in release mode
 
-```Dockerfile
+```dockerfile
 # syntax=docker/dockerfile:1.5
 
 ARG RUST_VERSION=1.69
@@ -40,7 +40,7 @@ build artifacts, which increase the size and keeps the data which is not needed 
 
 Let's mintroduce two stages - build and main:
 
-```Dockerfile
+```dockerfile
 # syntax=docker/dockerfile:1.5
 
 ARG RUST_VERSION=1.69
@@ -135,7 +135,7 @@ chmod +x build-for-targetarch.sh
 
 Change the `Dockerfile` content to following:
 
-```
+```dockerfile
 # syntax=docker/dockerfile:1.5
 
 ARG RUST_VERSION=1.69
@@ -183,9 +183,23 @@ Try building for multiple platforms:
 docker buildx build --platform=linux/aarch64,linux/amd64 -t ultimage-dockerfile-for-rust .
 ```
 
-## Native Dependencies
+## Native Dependencies - gcc
 
 Let's try adding native dependencies to our `Cargo.toml`
+```shell
+cargo add zstd
+```
+
+After trying to build our Dockerfile, we get the following error:
+```
+ error occurred: Failed to find tool. Is `x86_64-linux-gnu-gcc` installed?
+```
+
+Let's change our Dockerfile to support native cross-compilation
+
+```dockerfile
+
+```
 
 
 - Cross-Compilation with LLVM
